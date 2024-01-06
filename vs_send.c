@@ -35,7 +35,7 @@ int eventhandler(rudp_socket_t rsocket, rudp_event_t event, struct sockaddr_in *
  * Global variables
  */
 
-int debug = 0;			/* Debug flag */
+int debug = 1;			/* Debug flag */
 struct sockaddr_in peers[MAXPEERS];	/* IP address and port */
 int npeers = 0;			/* Number of elements in peers */
 
@@ -214,41 +214,41 @@ int filesender(int file, void *arg) {
 
     bytes = read(file, &vs.vs_info.vs_data,VS_MAXDATA);
     if (bytes < 0) {
-	perror("filesender: read");
-	event_fd_delete(filesender, rsock);
-	rudp_close(rsock);		
-    }
-    else if (bytes == 0) {
-	vs.vs_type = htonl(VS_TYPE_END);
-	vslen = sizeof(vs.vs_type);
-	for (p = 0; p < npeers; p++) {
-	    if (debug) {
-		fprintf(stderr, "vs_send: send END (%d bytes) to %s:%d\n", 
-			vslen, inet_ntoa(peers[p].sin_addr), htons(peers[p].sin_port));
-	    }
-	    if (rudp_sendto(rsock, (char *) &vs, vslen, &peers[p]) < 0) {
-		fprintf(stderr,"rudp_sender: send failure\n");
-		break;
-	    }
-	}
-	event_fd_delete(filesender, rsock);
-	rudp_close(rsock);		
-    }
-    else {
-	vs.vs_type = htonl(VS_TYPE_DATA);
-	vslen = sizeof(vs.vs_type) + bytes;
-	for (p = 0; p < npeers; p++) {
-	    if (debug) {
-		fprintf(stderr, "vs_send: send DATA (%d bytes) to %s:%d\n", 
-			vslen, inet_ntoa(peers[p].sin_addr), htons(peers[p].sin_port));				
-	    }
-	    if (rudp_sendto(rsock, (char *) &vs, vslen, &peers[p]) < 0) {
-		fprintf(stderr,"rudp_sender: send failure\n");
+		perror("filesender: read");
 		event_fd_delete(filesender, rsock);
 		rudp_close(rsock);		
-		break;
-	    }
-	}
+    }
+    else if (bytes == 0) {
+		vs.vs_type = htonl(VS_TYPE_END);
+		vslen = sizeof(vs.vs_type);
+		for (p = 0; p < npeers; p++) {
+			if (debug) {
+				fprintf(stderr, "vs_send: send END (%d bytes) to %s:%d\n", 
+					vslen, inet_ntoa(peers[p].sin_addr), htons(peers[p].sin_port));
+			}
+			if (rudp_sendto(rsock, (char *) &vs, vslen, &peers[p]) < 0) {
+				fprintf(stderr,"rudp_sender: send failure\n");
+				break;
+			}
+		}
+		event_fd_delete(filesender, rsock);
+		rudp_close(rsock);		
+    }
+    else {
+		vs.vs_type = htonl(VS_TYPE_DATA);
+		vslen = sizeof(vs.vs_type) + bytes;
+		for (p = 0; p < npeers; p++) {
+			if (debug) {
+				fprintf(stderr, "vs_send: send DATA (%d bytes) to %s:%d\n", 
+					vslen, inet_ntoa(peers[p].sin_addr), htons(peers[p].sin_port));				
+			}
+			if (rudp_sendto(rsock, (char *) &vs, vslen, &peers[p]) < 0) {
+				fprintf(stderr,"rudp_sender: send failure\n");
+				event_fd_delete(filesender, rsock);
+				rudp_close(rsock);		
+				break;
+			}
+		}
     }
     return 0;
 }

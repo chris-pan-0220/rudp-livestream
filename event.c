@@ -3,7 +3,7 @@
   File:   event.c
   Description: Rudp event handling: registering file descriptors and timeouts
                and eventloop using the select() system call.
-  Author: Olof Hagsand and Peter Sjödin
+  Author: Olof Hagsand and Peter Sjï¿½din
   CVS Version: $Id: event.c,v 1.3 2007/05/03 10:46:06 psj Exp $
  
   This is free software; you can redistribute it and/or modify
@@ -89,6 +89,7 @@ event_timeout(struct timeval t,
     e->e_time = t;
 
     /* Sort into right place */
+    // TODO: check
     e_prev = &ee_timers;
     for (e1 = ee_timers; e1; e1 =e1->e_next){
 	if (timercmp(&e->e_time, &e1->e_time, <))
@@ -96,7 +97,7 @@ event_timeout(struct timeval t,
 	e_prev = &e1->e_next;
     }
     e->e_next = e1;
-    *e_prev = e;
+    *e_prev = e; 
     return 0;
 }
 

@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -g -Wall
 
-all: vs_send vs_recv
+all: vs_send vs_recv rudp_sender rudp_recver
 
 vs_send: vs_send.o rudp.o event.o
 	$(CC) $(CFLAGS) $^ -o $@
@@ -9,7 +9,13 @@ vs_send: vs_send.o rudp.o event.o
 vs_recv: vs_recv.o rudp.o event.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-vs_send.o vs_recv.o rudp.o: rudp.h rudp_api.h event.h
+rudp_sender: rudp_sender.o rudp.o event.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+rudp_recver: rudp_recver.o rudp.o event.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+vs_send.o vs_recv.o rudp.o rudp_sender.o rudp_recver.o: rudp.h rudp_api.h event.h
 
 event.c: event.h
 
